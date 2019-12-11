@@ -12,6 +12,15 @@
     
     
     <item>
+      <title>Project 1: Exploratory Data Analysis</title>
+      <link>/project1/</link>
+      <pubDate>Wed, 11 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/project1/</guid>
+      <description>Jonathan Choi jjc4292 healthinsurance &amp;lt;- read.csv(&amp;quot;healthinsurance.csv&amp;quot;) kaggle_income &amp;lt;- read.csv(&amp;quot;kaggle_income.csv&amp;quot;) 0. Introduction I have chosen a dataset that contains data on healthcare insurance coverage rates before and after the Affordable Care Act, and the other dataset I have chosen is one that covers US household incomes across state, county, city, and more. More specifically, US household income contains 19 variables ranging from State code, State name, State abbreviation, county, city, zip code, longitude, latitude, mean household income, median household income, the number of households, and more.</description>
+    </item>
+    
+    <item>
       <title>Python</title>
       <link>/blog/python/</link>
       <pubDate>Wed, 11 Dec 2019 00:00:00 +0000</pubDate>
@@ -40,15 +49,6 @@ import re string1=&amp;quot;We have to extract these numbers 12, 47, 48 The inte
       
       <guid>/myresume/</guid>
       <description></description>
-    </item>
-    
-    <item>
-      <title>Project 1: Exploratory Data Analysis</title>
-      <link>/project1/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/project1/</guid>
-      <description>Jonathan Choi jjc4292 healthinsurance &amp;lt;- read.csv(&amp;quot;healthinsurance.csv&amp;quot;) kaggle_income &amp;lt;- read.csv(&amp;quot;kaggle_income.csv&amp;quot;) 0. Introduction I have chosen a dataset that contains data on healthcare insurance coverage rates before and after the Affordable Care Act, and the other dataset I have chosen is one that covers US household incomes across state, county, city, and more. More specifically, US household income contains 19 variables ranging from State code, State name, State abbreviation, county, city, zip code, longitude, latitude, mean household income, median household income, the number of households, and more.</description>
     </item>
     
     <item>
