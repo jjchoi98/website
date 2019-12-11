@@ -1,5 +1,5 @@
 ---
-title: Introduction
+title: Python
 author: Jonathan Choi
 date: '2019-12-11'
 slug: my-thoughts
@@ -7,6 +7,9 @@ categories: []
 tags: []
 description: ''
 ---
-Hey Guys!
-Welcome to my blog!
-I really like to watch movies, play basketball, go bowling, cook, and make music.
+import re
+
+string1="We have to extract these numbers 12, 47, 48 The integers numbers are also interesting: 189 2036 314\',\' is a separator, so please extract these numbers 125,789,1450 and also these 564,90456 We like to offer you 7890$ per month in order to complete this task... we are joking"
+print(string1)
+
+re.findall(r"\d+",string1)
