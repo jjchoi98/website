@@ -27,7 +27,7 @@ library(dplyr)
 data&lt;-read.csv(&quot;insurance 2.csv&quot;)
 data&lt;-data%&gt;%na.omit</code></pre>
 <ul>
-<li>**1. *</li>
+<li>**1. MANOVA Test*</li>
 </ul>
 <pre class="r"><code>#MANOVA
 man1&lt;-manova(cbind(bmi,charges)~region, data=data)
@@ -113,7 +113,7 @@ for(i in 1:3){print(covmats$covs[i])}</code></pre>
 ## charges 12940.97080 195191595.78</code></pre>
 <p><em>1 MANOVA, 2 ANOVAS, and 12 t tests were conducted for a total of 15 tests. The adjusted alpha level is 0.05/15 = 0.333. The MANOVA test and both ANOVA tests showed a significant difference in mean bmi and mean charges between regions. The results of t tests showed that with an adjusted alpha level, Southeast and Northeast, Northwest and Southeast, Southwest and Northeast, Southwest and Northwest, and Southwest and Southeast show a significant difference in mean bmi. The results of t tests showed that with an adjusted alpha level, Norhwest and Southeast, and Southwest and Southeast show a significant difference in mean charge. The probability of a type one error is 0.5367088. The assumptions are not likely to have been met because the even though plots look normally distributed, the covariance shows no homogeneity.</em></p>
 <ul>
-<li>**2. *</li>
+<li>**2.Randomization Test *</li>
 </ul>
 <pre class="r"><code>dataA&lt;-data%&gt;%dplyr::select(smoker, bmi)
 
@@ -129,11 +129,11 @@ rand_dist[i]&lt;-mean(yeet[yeet$smoker==&quot;yes&quot;,]$bmi)-
  mean(yeet[yeet$smoker==&quot;no&quot;,]$bmi)}
 
 mean(rand_dist&gt;0.05665379   )*2</code></pre>
-<pre><code>## [1] 0.9028</code></pre>
+<pre><code>## [1] 0.8928</code></pre>
 <pre class="r"><code>{hist(rand_dist,main=&quot;&quot;, ylab=&quot;&quot;); abline(v = 0.05665379    , col = &quot;red&quot;)}</code></pre>
 <p><img src="/Project2_files/figure-html/unnamed-chunk-3-1.png" width="768" style="display: block; margin: auto;" /> <em>The null hypothesis is that the mean bmi is the same for being a smoker and non-smoker. The alternative hypothesis is that the mean bmi is different for smokers and non-smokers.The p-value was 0.9144 which is greater than 0.05, which means we fail to reject the null hypothesis. This means that there is sufficient evidence to say that the mean bmi is the same for smoker and non-smokers.</em></p>
 <ul>
-<li>**3. *</li>
+<li>**3.Linear Regression Model *</li>
 </ul>
 <pre class="r"><code>#Center Means
 data$bmi_c&lt;-data$bmi-mean(data$bmi)
@@ -241,7 +241,7 @@ freedom
 ## F-statistic: 14.6 on 4 and 1333 DF, p-value: 1.124e-11</code></pre>
 <p><em>The coefficient estimate of the intercept is 14060.83 which indicates the amount charged when bmi and located in the northeast. The coefficient of bmi_c is 439.26 when all other variables are controlled.This means that if there is 1 unit increase in bmi would then increase amount charged from insurance by 439.26 dollars. The coefficient of regionnorthwest is -1072.01, which means that for 1 increase in bmi it would decrease amount charged by 1072.26 dollars. The coefficient of regionsoutheast is -155.85, which means that for 1 increase in bmi, it would decrease amount charged by 155.85 dollars. The coefficient of regionsouthwest is -1683.67, which means that for 1 increase in bmi, it would decrease the amount charged by 1683.67 dollars. The coefficient of bmi_c:regionnorthwest is -48.96 which means that for 1 increase in bmi, the slope of regionnorthwest decreases by 48.96. The coefficient of bmi_c:regionsoutheast is -130.85, which means that for 1 increase in bmi, the slope of regionsoutheast decreases by 130.85. The coefficient of bmi_c:southwest is 13.39 which means that for 1 increase in bmi, the slope of regionsouthwest is increased by 13.39. The interaction plot shows the lines to be parallel; thus, there is no significant interaction. Looking at the ggplot, the homoskedasticity and linearity is not that great. The p-value from the bptest is 2.2x10^-16 which is less than 0.05; thus the homoskedasticity is not met. Based on the graphs, normality looks ok. The Shapiro-Wilk normality test gives a p-value of less than 0.05 which means our distribution is normal. Comparing the uncorrected SE and the robust SEs, the standard errors increased for the intercept, bmi_c, regionnorthwest, regionnsoutheast, regionsouthwest. This means that as the standard errors increased, then the p-values also increased. The model explains 0.04284 of the variation of the outcome.</em></p>
 <ul>
-<li>**4.*</li>
+<li>**4.Linear Regression Model (with Interactions)*</li>
 </ul>
 <pre class="r"><code>samp_distn&lt;-replicate(5000, {
  boot_dat&lt;-data[sample(nrow(data),replace=TRUE),]
@@ -251,12 +251,12 @@ freedom
 samp_distn%&gt;%t%&gt;%as.data.frame%&gt;%summarize_all(sd)</code></pre>
 <pre><code>## (Intercept) bmi_c regionnorthwest regionsoutheast
 regionsouthwest bmi_c:regionnorthwest
-## 1 713.9327 109.4091 999.4348 963.0441 950.7329 166.8187
+## 1 718.7764 110.0578 1015.468 975.988 954.461 169.0851
 ## bmi_c:regionsoutheast bmi_c:regionsouthwest
-## 1 159.2829 154.4963</code></pre>
+## 1 160.893 152.1001</code></pre>
 <p><em>Bootstrapped standard errors are greater than original standard errors but less than robust SEs.</em></p>
 <ul>
-<li>**5.*</li>
+<li>**5.Logistic Regression*</li>
 </ul>
 <pre class="r"><code>#logistic regression
 data1&lt;-data%&gt;%mutate(smoker=ifelse(data$smoker==&quot;yes&quot;,1,0))
@@ -362,7 +362,7 @@ apply(diags,2,mean)</code></pre>
 ## 0.9319661 0.8097611 0.9643649 0.8593115 0.9820508</code></pre>
 <p><em>For 0 bmi and 0 charge, the odds of being a smoker is 2.6206461. Controlling for bmi, for every 1 unit increase in charges, the odds of being a smoker changes by a factor of 1.0003193. Controlling for charges, for every 1 unit increase in bmi, the odds of being a smoker changes by a factor of 0.7534329. The accuracy is 0.9334828. The sensitivity is 0.8627451. The specificity is 0.9671053. The PPV is 0.8029197. The AUC is 0.9823229, which means that this model is very good at predicting activity. After doing 10-fold CV, the accuracy is 0.9312816, the sensitivity is 0.7948521, the specificity is 0.9663455, the PPV is 0.8569134, and the AUC increased slightly to 0.9824689. There was not much overfitting be4cause there wasn’t a big change.</em></p>
 <ul>
-<li>**6. *</li>
+<li>**6.LASSO Regression*</li>
 </ul>
 <pre class="r"><code>library(glmnet)
 y&lt;-as.matrix(data$smoker)
