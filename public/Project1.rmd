@@ -1,0 +1,127 @@
+---
+title: 'Project 1: Exploratory Data Analysis'
+author: "SDS348 Fall 2019"
+date: "9/16/2019"
+output:
+  pdf_document:
+    toc: yes
+  html_document:
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
+```
+## Jonathan Choi jjc4292
+```{R}
+healthinsurance <- read.csv("healthinsurance.csv")
+kaggle_income <- read.csv("kaggle_income.csv")
+```
+
+###0. Introduction
+*I have chosen a dataset that contains data on healthcare insurance coverage rates before and after the Affordable Care Act, and the other dataset I have chosen is one that covers US household incomes across state, county, city, and more. More specifically, US household income contains 19 variables ranging from State code, State name, State abbreviation, county, city, zip code, longitude, latitude, mean household income, median household income, the number of households, and more. The healthcare insurance data contains 14 variables containing the state, uninsured rate in 2010 and 2015, health insurance converage change, employer health insurance converage (2015), state Medicaid expansion (2016), Medicaid enrollment in 2013 and 2016, Medicaid enrollment change from 2013-2016, and Medicare enrollment in 2016, and more. The information for the US household income data was acquired through the US Census Reports, and the information for the Health Insurance dataset was acquired through from the US Department of Health and Human Services and the US Census Bureau.*
+
+*The health insurance data set was interesting to me because of my personal aspirations in the field of medicine and health care delivery across all people groups. I am interested in studying the different insurance and health care systems in different countries. More importantly, I am also curious why the US does not have the better health outcomes compared to other countries, despite the US spending more than any other country in health care. Thus, the healthcare data set was interesting to me because it allowed me to investigate the different effects the Affordable Care Act had on Americans and how health insurance coverage changed over the years. The US household income data set was intersting to me because I was interested to see if there was any sort of connection between one's income and residing state to whether or not they have health insurance and how the Affordable Care Act may have impacted those insured rates. I expect to see that states or cities with higher average household incomes to have higher rates of health insurance coverage, and to see the greatest change in the rate of health insurance coverage in states that have lower average household incomes.*
+
+    
+###1. Tidying: Rearranging Wide/Long 
+```{R}
+
+```    
+*Talked to Dr. Woodward and he said that I don't need to worry about this part because of my peculiar dataset leads to a lot of complications trying to untidy and then tidy again.*
+
+###2. Joining/Merging
+```{R}
+library(tidyverse)
+joined1<-full_join(healthinsurance,kaggle_income, by=c("State"="State_Name"))
+
+
+```   
+*I decided to use a full join function because I did not want to lose any variables while joining the two data sets. I wanted to encompass all the variables as I analyzed them and realized that a lot of my variables would be lost had I used the other joins, and I wanted to keep all of my original data which is why I used the full join function. No cases were dropped, rather more cases were added. The full join function works to retain all original data and input NAs where there are no matches between the two datasets.*
+
+###3. Wrangling
+```{R}
+Texas<-joined1%>%filter(State=="Texas")
+arangeTX<-Texas%>%arrange(Mean)
+selTx<-Texas%>%select("Medicaid.Enrollment.Change..2013.2016.","Medicare.Enrollment..2016.",Mean)
+
+Texas<-Texas%>%rename(MedEnrllChange="Medicaid.Enrollment.Change..2013.2016.")
+joined<-joined1%>%rename(MedEnrllChange="Medicaid.Enrollment.Change..2013.2016.",
+                         StMedExp="State.Medicaid.Expansion..2016.",
+                         UninRCh="Uninsured.Rate.Change..2010.2015.")%>%na.omit()
+mutTx<-Texas%>%mutate(row_number(Median))
+joined%>%summarize(avgMedicaidenrllchange=mean(MedEnrllChange,na.rm = T))
+
+sum<-joined%>%group_by(City,County)%>%
+  summarize(mean_change=mean(MedEnrllChange,na.rm = T),
+            sd(MedEnrllChange),var(MedEnrllChange))
+joined%>%summarize_all(n_distinct)
+joined%>%na.omit()%>%summarize(median(MedEnrllChange))
+joined%>%summarize(IQR(MedEnrllChange))
+joined%>%summarize(min(MedEnrllChange))
+joined%>%summarize(max(MedEnrllChange))
+joined%>%summarize(first(MedEnrllChange))
+joined%>%select(MedEnrllChange,Mean,)%>%cor()
+
+```
+*I used the filter function to filter to get just data from Texas. I then used the arrange function to sort the data set from least to greatest.I then used the select function to choose a subset of variable/columns. And then, I used the rename function which renamed my variable names. Then, I created another variable using the mutate function. Then, I used the summarize function to find the mean of Medicaid enrollment change from 2013-2016. I grouped by City and County and did a summarize function to find the mean Medicaid Enrollment Change for each city. I continued to use the summarize functions to find the calculate the variance, standard deviation, mean, median, interquartile range, minimum, maximum, and find the first value, as well as the number of unique variables.Lastly, I did a correlation function between mean household income and Medicaid enrollment change from 2013-2016. Some results I was able to get from these analysis were the average change in Medicaid Enrollment over the 2013-2016 time frame were the correlation that resulted came out to be fairly small of 0.0697 between the Medicaid enrollment change and average household income. This value indicates a fairly weak positive correlation between the two.  * 
+
+###4. Visualizing
+    
+```{R}
+library(ggplot2)
+
+  ggplot(joined,aes(MedEnrllChange,Mean))+
+  geom_point(aes(color=State,))+
+  ggtitle("Mean Income vs Medicaid.Enrollment.Change..2013.2016.")+
+    ylab("Mean Income")+
+    xlab("Medicaid.Enrollment.Change..2013.2016.")+
+      scale_x_log10()+
+  scale_y_log10()+
+  theme(legend.title = element_text(size = 3), 
+               legend.text = element_text(size = 3))+
+  theme_dark()
+  
+  
+ ggplot(joined,aes(x=State,y=MedEnrllChange,fill=StMedExp))+
+  geom_bar(stat="summary",fun.y="mean",position="dodge")+
+    coord_flip()+
+   ggtitle("State vs Medicaid.Enrollment.Change..2013.2016. vs State.Medicaid.Expansion..2016.")+
+   theme(plot.title = element_text(size=10))+
+   ylab("Medicaid.Enrollment.Change..2013.2016.")
+```
+*The first ggplot was a scatter plot and I observed the relationships between the Mean Household Income and States and Medican Enrollment Change. The results showed that most states had a big increase in Medicaid Enrollment Change with California being an outlier with a bigger increase in the Medicaid Enrollment change than any other state. There is a lot of clustering as well. There are not any significant or ntoticeable trends we can directly observe.*
+*The second ggplot was a bar graph I observed the relationships between the Medicaid Enrollment change and the States and whether the state Medicaid expanded. The biggest thing we can observe from this plot the increase in Medicaid enrollment change in each state. California is an outlier and has the biggest increase in Medicait enrollment change from 2013-2016.*
+
+###5. Dimensionality Reduction
+
+```{R}
+yeet<-joined%>%select_if(is.numeric)%>%scale%>%cov%>%round(2)
+hoola<-princomp(yeet)
+names(hoola)
+summary(hoola,loadings = T)
+apples<-hoola$sdev^2
+
+round(cumsum(apples)/sum(apples),2)
+ggplot()+geom_point(aes(hoola$scores[,1], hoola$scores[,2]))+xlab("PC1")+ylab("PC2")
+
+hoola$loadings[1:7,1:2]%>%as.data.frame%>%rownames_to_column%>%
+ggplot()+geom_hline(aes(yintercept=0),lty=2)+
+ geom_vline(aes(xintercept=0),lty=2)+ylab("PC2")+xlab("PC1")+
+ geom_segment(aes(x=0,y=0,xend=Comp.1,yend=Comp.2),arrow=arrow(),col="red")+
+ geom_label(aes(x=Comp.1*1.1,y=Comp.2*1.1,label=rowname),size=2)+
+  theme(legend.text = element_text(size=7))
+```
+*The first PC1 and PC2 ggplot showed some clustering. The second ggplot was a plot of loadings. Some variable names got cut off, but the ones that did are labeled as Marketplace Tax Credits (2016), Medicaid Enrollment Change (2013-2016), Marketplace Health Insurance Coverage (2016), Health Insurance Coverage Change (2010-2015), Medicaid Enrollment (2016), Employer Health Insurance Coverage (2015), and Medicaid Enrollment (2013). Angles between these vectors are interpreted as correlation and the smaller the angle, the higher the correlation. We can see from this graph that Marketplace Tax Credits (2016), Medicaid Enrollment Change (2013-2016), Marketplace Health Insurance Coverage (2016), Health Insurance Coverage Change (2010-2015) are all highly correlated with each other.*
+    
+    
+
+...
+
+
+
+
+

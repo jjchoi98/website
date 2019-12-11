@@ -1,0 +1,267 @@
+---
+title: 'Project 2: Modeling, Testing, and Predicting'
+author: "SDS348 Fall 2019"
+date: ''
+output:
+  pdf_document:
+    toc: yes
+  html_document:
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+hook_output = knit_hooks$get('output')
+knit_hooks$set(output = function(x, options) {
+  # this hook is used only when the linewidth option is not NULL
+  if (!is.null(n <- options$linewidth)) {
+    x = knitr:::split_lines(x)
+    # any lines wider than n should be wrapped
+    if (any(nchar(x) > n)) x = strwrap(x, width = n)
+    x = paste(x, collapse = '\n')
+  }
+  hook_output(x, options)
+})
+
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE,fig.align="center",warning=FALSE,message=FALSE,fig.width=8, fig.height=5, linewidth=60)
+options(tibble.width = 100,width = 100)
+library(tidyverse)
+```
+##Jonathan Choi jjc4292
+
+# Modeling
+
+
+- **0.*
+*I have chosen a data set that contains data on Medical Costs that are billed by insurance to patients. This data set contains 7 variables ranging from sex, age, bmi (body mass index), the number of children they have covered by insurance, whether or not they are a smoker, region, and medical charges from insurance. This data set looks at different factors that may contribute to predicting medical costs billed by their insurance.*
+
+```{R}
+library(tidyverse)
+library(dplyr)
+data<-read.csv("insurance 2.csv")
+data<-data%>%na.omit
+
+```
+
+- **1. *
+
+```{R}
+#MANOVA
+man1<-manova(cbind(bmi,charges)~region, data=data)
+summary(man1)
+#Univariate ANOVAs
+summary.aov(man1)
+#Mean Differences 
+data%>%group_by(region)%>%summarize(mean(bmi),mean(charges))
+#post hoc t tests 
+pairwise.t.test(data$bmi,data$region,p.adj="none")
+pairwise.t.test(data$charges, data$region,p.adj="none")
+1-.95^15
+ggplot(data, aes(x = age, y = bmi)) +
+ geom_point(alpha = .5) + geom_density_2d(h=50) + coord_fixed() + facet_wrap(~region)
+datA0<-data%>%select(bmi,charges,region)
+covmats<-datA0%>%group_by(region)%>%do(covs=cov(.[1:2]))
+for(i in 1:3){print(covmats$covs[i])}
+
+
+```
+*1 MANOVA, 2 ANOVAS, and 12 t tests were conducted for a total of 15 tests. The adjusted alpha level is 0.05/15 = 0.333. The MANOVA test and both ANOVA tests showed a significant difference in mean bmi and mean charges between regions. The results of t tests showed that with an adjusted alpha level, Southeast and Northeast, Northwest and Southeast, Southwest and Northeast, Southwest and Northwest, and Southwest and Southeast show a significant difference in mean bmi. The results of t tests showed that with an adjusted alpha level, Norhwest and Southeast, and Southwest and Southeast show a significant difference in mean charge.  The probability of a type one error is 0.5367088. The assumptions are not likely to have been met because the even though plots look normally distributed, the covariance shows no homogeneity.*
+
+- **2. *
+
+```{R}
+dataA<-data%>%dplyr::select(smoker, bmi)
+
+dataA%>%group_by(smoker) %>% summarise(means= mean(bmi)) %>% summarise(`mean_diff:`=diff(means))
+	
+rand_dist<-vector()
+for(i in 1:5000){
+yeet<-data.frame(bmi=sample(dataA$bmi),smoker=dataA$smoker)
+rand_dist[i]<-mean(yeet[yeet$smoker=="yes",]$bmi)-
+ mean(yeet[yeet$smoker=="no",]$bmi)}
+
+mean(rand_dist>0.05665379	)*2
+
+{hist(rand_dist,main="", ylab=""); abline(v = 0.05665379	, col = "red")}
+
+
+```
+*The null hypothesis is that the mean bmi is the same for being a smoker and non-smoker. The alternative hypothesis is that the mean bmi is different for smokers and non-smokers.The p-value was 0.9144 which is greater than 0.05, which means we fail to reject the null hypothesis. This means that there is sufficient evidence to say that the mean bmi is the same for smoker and non-smokers.*
+
+- **3. *
+    
+```{R}
+#Center Means
+data$bmi_c<-data$bmi-mean(data$bmi)
+#Linear regression model
+fit<-lm(charges ~ bmi_c * region, data=data)
+summary(fit)
+#Plot
+ggplot(data, aes(x=bmi, y=charges,group=region))+geom_point(aes(color=region))+
+ geom_smooth(method="lm",formula=y~1,se=F,fullrange=T,aes(color=region))+
+theme(legend.position=c(.9,.19))+xlab("")
+
+#Assumptions
+library(sandwich)
+library(lmtest)
+bptest(fit)
+resids<-fit$residuals
+fitvals<-fit$fitted.values
+ggplot()+geom_point(aes(fitvals,resids))+geom_hline(yintercept=0, color='red')
+ggplot()+geom_histogram(aes(resids), bins=20)
+shapiro.test(resids) 
+
+#robust standard errors 
+summary(fit)$coef[,1:2]
+coeftest(fit, vcov = vcovHC(fit))[,1:2]
+
+
+#Main effects 
+fit2<-lm(charges ~ bmi_c + region, data=data)
+summary(fit2)
+```
+*The coefficient estimate of the intercept is 14060.83 which indicates the amount charged when bmi and located in the northeast. The coefficient of bmi_c is 439.26 when all other variables are controlled.This means that if there is 1 unit increase in bmi would then increase amount charged from insurance by 439.26 dollars. The coefficient of regionnorthwest is -1072.01, which means that for 1 increase in bmi it would decrease amount charged by 1072.26 dollars. The coefficient of regionsoutheast is -155.85, which means that for 1 increase in bmi, it would decrease amount charged by 155.85 dollars. The coefficient of regionsouthwest is -1683.67, which means that for 1 increase in bmi, it would decrease the amount charged by 1683.67 dollars. The coefficient of bmi_c:regionnorthwest is -48.96 which means that  for 1 increase in bmi, the slope of regionnorthwest decreases by 48.96. The coefficient of bmi_c:regionsoutheast is -130.85, which means that for 1 increase in bmi, the slope of regionsoutheast decreases by 130.85. The coefficient of bmi_c:southwest is 13.39 which means that for 1 increase in bmi, the slope of regionsouthwest is increased by 13.39. The interaction plot shows the lines to be parallel; thus, there is no significant interaction.  Looking at the ggplot, the homoskedasticity and linearity is not that great. The p-value from the bptest is 2.2x10^-16 which is less than 0.05; thus the homoskedasticity is not met. Based on the graphs, normality looks ok. The Shapiro-Wilk normality test gives a p-value of less than 0.05 which means our distribution is normal. Comparing the uncorrected SE and the robust SEs, the standard errors increased for the intercept, bmi_c, regionnorthwest, regionnsoutheast, regionsouthwest. This means that as the standard errors increased, then the p-values also increased. The model explains 0.04284 of the variation of the outcome.*
+
+- **4.*
+
+```{R}
+samp_distn<-replicate(5000, {
+ boot_dat<-data[sample(nrow(data),replace=TRUE),]
+ fit3<-lm(charges ~ bmi_c * region,data=boot_dat)
+ coef(fit3)
+})
+samp_distn%>%t%>%as.data.frame%>%summarize_all(sd)
+
+
+
+```
+*Bootstrapped standard errors are greater than original standard errors but less than robust SEs.*
+
+- **5.*
+    
+```{R}
+#logistic regression
+data1<-data%>%mutate(smoker=ifelse(data$smoker=="yes",1,0))
+fit4<-glm(smoker~charges+bmi,data=data1,family=binomial(link="logit"))
+coeftest(fit4)
+#coefficients
+exp(coef(fit4))
+#confusion matrix 
+data$predicted<-predict(fit4, data=data, type = "response")
+table(predict=as.numeric(data$predicted>.5),truth=data$smoker)%>%addmargins
+
+#accuracy
+(220+1029)/1338
+
+#sensitivity 
+220/255
+
+#specificity (TNR)
+1029/1064
+
+#PPV
+220/274
+
+#Density plot
+
+odds<-function(p)p/(1-p)
+p<-seq(0,1,by=.1)
+logit<-function(p)log(odds(p))
+data$logit<- predict(fit4)
+ggplot(data) + geom_density(aes(logit, fill=as.factor(smoker)))
+
+
+#ROC plot
+library(plotROC) 
+ggplot(data,aes(charges,predicted,color=bmi))+geom_line()
+ROCplot<-ggplot(data)+geom_roc(aes(d=smoker,m=predicted), n.cuts=0)+
+ geom_segment(aes(x=0,xend=1,y=0,yend=1),lty=2)
+ROCplot
+
+#AUC
+calc_auc(ROCplot)
+
+##CV
+class_diag<-function(probs,truth){
+
+tab<-table(factor(probs>.5,levels=c("FALSE","TRUE")),truth)
+acc=sum(diag(tab))/sum(tab)
+sens=tab[2,2]/colSums(tab)[2]
+spec=tab[1,1]/colSums(tab)[1]
+ppv=tab[2,2]/rowSums(tab)[2]
+
+if(is.numeric(truth)==FALSE & is.logical(truth)==FALSE) truth<-as.numeric(truth)-1
+
+ord<-order(probs, decreasing=TRUE)
+probs <- probs[ord]; truth <- truth[ord]
+
+TPR=cumsum(truth)/max(1,sum(truth)) 
+FPR=cumsum(!truth)/max(1,sum(!truth))
+
+dup<-c(probs[-1]>=probs[-length(probs)], FALSE)
+TPR<-c(0,TPR[!dup],1); FPR<-c(0,FPR[!dup],1)
+
+n <- length(TPR)
+auc<- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )
+
+data.frame(acc,sens,spec,ppv,auc)
+}
+
+set.seed(1234)
+k=10
+
+dataX<-data[sample(nrow(data)),]
+folds<-cut(seq(1:nrow(data)),breaks=k,labels=F)
+
+diags<-NULL
+for(i in 1:k){
+train<-dataX[folds!=i,]
+test<-dataX[folds==i,]
+truth<-test$smoker
+fit6<- glm(smoker~charges+bmi,data=train,family=binomial(link="logit"))
+probs<- predict(fit6, newdata=test, type="response")
+diags<-rbind(diags,class_diag(probs,truth))}
+
+apply(diags,2,mean)
+```
+*For 0 bmi and 0 charge, the odds of being a smoker is 2.6206461. Controlling for bmi, for every 1 unit increase in charges, the odds of being a smoker changes by a factor of 1.0003193. Controlling for charges, for every 1 unit increase in bmi, the odds of being a smoker changes by a factor of 0.7534329. The accuracy is 0.9334828. The sensitivity is 0.8627451. The specificity is 0.9671053. The PPV is 0.8029197. The AUC is 0.9823229, which means that this model is very good at predicting activity. After doing 10-fold CV, the accuracy is 0.9312816, the sensitivity is 0.7948521, the specificity is 0.9663455, the PPV is 0.8569134, and the AUC increased slightly to 0.9824689. There was not much overfitting be4cause there wasn't a big change.*
+
+- **6. *
+
+```{R}
+library(glmnet)
+y<-as.matrix(data$smoker)
+x<-data%>%dplyr::select(-smoker,-region,-sex,-predicted)%>%mutate_all(scale)%>%as.matrix
+cv<-cv.glmnet(x,y,family="binomial")
+lasso<-glmnet(x,y,family="binomial",lambda=cv$lambda.1se)
+coef(lasso)
+
+set.seed(1234)
+k=10
+
+dataX<-data[sample(nrow(data)),]
+folds<-cut(seq(1:nrow(data)),breaks=k,labels=F)
+
+diags2<-NULL
+for(i in 1:k){
+train2<-dataX[folds!=i,]
+test2<-dataX[folds==i,]
+truth2<-test$smoker
+fit7<- glm(smoker~age, bmi, charges,data=train2,family=binomial(link="logit"))
+probs2<- predict(fit7, newdata=test, type="response")
+diags2<-rbind(diags2,class_diag(probs2,truth2))}
+
+apply(diags2,2,mean)
+
+```
+*The variables that were retained were age, charges, and logit. The AUC was 0.5153859. The specificity was 0.1185185. The accuracy was 0.7350746. The specificity was 0.8906542.  After performing a 10 fold cv, the accuracy from this model was lower than that of my logistic regression in part 5.*
+
+...
+
+
+
+
+

@@ -1,0 +1,8 @@
+"0","knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)"
+"2","Warning message:
+"
+"2","In bookdown:::check_special_chars(files) :"
+"2","
+ "
+"2"," The filename ""content/MYProject1-1 copy.rmd"" contains special characters. You may rename it to, e.g., ""content/MYProject1-1-copy.rmd"".
+"

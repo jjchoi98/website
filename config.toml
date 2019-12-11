@@ -13,20 +13,18 @@ theme = "hugo-sustain"
 [params]
   avatar = "ok.jpg"
   author = "Jonathan Choi"
-  description = "Describe your website"
+  description = "This is a website created using R-Studio and contains projects I have worked on to show my R-language proficiency. This website also contains my resume and further links to contact me. "
 
   # Custom assets can be linked with their paths relative to static/
   custom_css = []
   custom_js  = []
 
 [params.social]
-  Github        = "username"
-  Email         = "email@example.com"
-  Twitter       = "username"
-  LinkedIn      = "username"
-  Stackoverflow = "username"
-  Medium        = "username"
-  Telegram      = "username"
+  Github        = "jjchoi98"
+  Email         = "jjchoi98@gmail.com"
+  LinkedIn      = "jonathan-choi-"
+
+
 
 ## Main Menu
 [[menu.main]]

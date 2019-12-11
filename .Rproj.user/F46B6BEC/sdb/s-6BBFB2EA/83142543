@@ -1,14 +1,14 @@
 {
     "collab_server" : "",
-    "contents" : "baseurl = \"/\"\nlanguageCode = \"en-US\"\ntitle = \"Jonathan Choi\"\n# Enable comments by entering your Disqus shortname\ndisqusShortname = \"\"\n# Enable Google Analytics by entering your tracking code\ngoogleAnalytics = \"\"\ntheme = \"hugo-sustain\"\n\n[permalinks]\n  post = \"/:year/:month/:day/:slug\"\n\n[params]\n  avatar = \"ok.jpg\"\n  author = \"Jonathan Choi\"\n  description = \"Describe your website\"\n\n  # Custom assets can be linked with their paths relative to static/\n  custom_css = []\n  custom_js  = []\n\n[params.social]\n  Github        = \"username\"\n  Email         = \"email@example.com\"\n  Twitter       = \"username\"\n  LinkedIn      = \"username\"\n  Stackoverflow = \"username\"\n  Medium        = \"username\"\n  Telegram      = \"username\"\n\n## Main Menu\n[[menu.main]]\n  name = \"blog\"\n  weight = 100\n  identifier = \"blog\"\n  url = \"/blog/\"\n[[menu.main]]\n  name = \"projects\"\n  identifier = \"projects\"\n  weight = 200\n  url = \"/projects/\"\n[[menu.main]]\n  name = \"resume\"\n  identifier = \"resume\"\n  weight = 300\n  url = \"/resume/\"\n",
+    "contents" : "baseurl = \"/\"\nlanguageCode = \"en-US\"\ntitle = \"Jonathan Choi\"\n# Enable comments by entering your Disqus shortname\ndisqusShortname = \"\"\n# Enable Google Analytics by entering your tracking code\ngoogleAnalytics = \"\"\ntheme = \"hugo-sustain\"\n\n[permalinks]\n  post = \"/:year/:month/:day/:slug\"\n\n[params]\n  avatar = \"ok.jpg\"\n  author = \"Jonathan Choi\"\n  description = \"This is a website created using R-Studio and contains projects I have worked on to show my R-language proficiency. This website also contains my resume and further links to contact me. \"\n\n  # Custom assets can be linked with their paths relative to static/\n  custom_css = []\n  custom_js  = []\n\n[params.social]\n  Github        = \"jjchoi98\"\n  Email         = \"jjchoi98@gmail.com\"\n  LinkedIn      = \"jonathan-choi-\"\n\n\n\n## Main Menu\n[[menu.main]]\n  name = \"blog\"\n  weight = 100\n  identifier = \"blog\"\n  url = \"/blog/\"\n[[menu.main]]\n  name = \"projects\"\n  identifier = \"projects\"\n  weight = 200\n  url = \"/projects/\"\n[[menu.main]]\n  name = \"resume\"\n  identifier = \"resume\"\n  weight = 300\n  url = \"/resume/\"\n",
     "created" : 1575500017286.000,
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "3377590044",
+    "hash" : "2619277979",
     "id" : "83142543",
-    "lastKnownWriteTime" : 1575573758,
-    "last_content_update" : 1575573758933,
+    "lastKnownWriteTime" : 1576048017,
+    "last_content_update" : 1576048017056,
     "path" : "~/Desktop/websiteSDS348/config.toml",
     "project_path" : "config.toml",
     "properties" : {

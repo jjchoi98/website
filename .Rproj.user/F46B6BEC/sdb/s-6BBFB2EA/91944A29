@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "---\ncategories:\n- projects\ndate: \"2016-10-02T22:55:05-04:00\"\nshowpagemeta: false\ntags:\n- projects\ntitle: Projects\n---\n## Projects \n\nHere are some projects I have been working on:\n\n- [Project 1](/Project1/)\n\n- [Project 2](/Project2/)",
+    "created" : 1576048120716.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2997566198",
+    "id" : "91944A29",
+    "lastKnownWriteTime" : 1576055464,
+    "last_content_update" : 1576055464648,
+    "path" : "~/Desktop/websiteSDS348/content/projects.md",
+    "project_path" : "content/projects.md",
+    "properties" : {
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "markdown"
+}

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Jonathan Choi" />
+    <meta name="description" content="This is a website created using R-Studio and contains projects I have worked on to show my R-language proficiency. This website also contains my resume and further links to contact me. ">
+    <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico">
+    <title>Project 1: Exploratory Data Analysis</title>
+    <meta name="generator" content="Hugo 0.60.1" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="/"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="/blog/">BLOG</a></li>
+        
+        <li><a href="/projects/">PROJECTS</a></li>
+        
+        <li><a href="/resume/">RESUME</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="/project1/">Project 1: Exploratory Data Analysis</a></strong>
+          </h3>
+        </div>
+        <div class="blog-title">
+          <h4>
+          January 1, 0001
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+
+
+<div id="jonathan-choi-jjc4292" class="section level2">
+<h2>Jonathan Choi jjc4292</h2>
+<pre class="r"><code>healthinsurance &lt;- read.csv(&quot;healthinsurance.csv&quot;)
+kaggle_income &lt;- read.csv(&quot;kaggle_income.csv&quot;)</code></pre>
+<div id="introduction" class="section level3">
+<h3>0. Introduction</h3>
+<p><em>I have chosen a dataset that contains data on healthcare insurance coverage rates before and after the Affordable Care Act, and the other dataset I have chosen is one that covers US household incomes across state, county, city, and more. More specifically, US household income contains 19 variables ranging from State code, State name, State abbreviation, county, city, zip code, longitude, latitude, mean household income, median household income, the number of households, and more. The healthcare insurance data contains 14 variables containing the state, uninsured rate in 2010 and 2015, health insurance converage change, employer health insurance converage (2015), state Medicaid expansion (2016), Medicaid enrollment in 2013 and 2016, Medicaid enrollment change from 2013-2016, and Medicare enrollment in 2016, and more. The information for the US household income data was acquired through the US Census Reports, and the information for the Health Insurance dataset was acquired through from the US Department of Health and Human Services and the US Census Bureau.</em></p>
+<p><em>The health insurance data set was interesting to me because of my personal aspirations in the field of medicine and health care delivery across all people groups. I am interested in studying the different insurance and health care systems in different countries. More importantly, I am also curious why the US does not have the better health outcomes compared to other countries, despite the US spending more than any other country in health care. Thus, the healthcare data set was interesting to me because it allowed me to investigate the different effects the Affordable Care Act had on Americans and how health insurance coverage changed over the years. The US household income data set was intersting to me because I was interested to see if there was any sort of connection between one’s income and residing state to whether or not they have health insurance and how the Affordable Care Act may have impacted those insured rates. I expect to see that states or cities with higher average household incomes to have higher rates of health insurance coverage, and to see the greatest change in the rate of health insurance coverage in states that have lower average household incomes.</em></p>
+</div>
+<div id="tidying-rearranging-widelong" class="section level3">
+<h3>1. Tidying: Rearranging Wide/Long</h3>
+<p><em>Talked to Dr. Woodward and he said that I don’t need to worry about this part because of my peculiar dataset leads to a lot of complications trying to untidy and then tidy again.</em></p>
+</div>
+<div id="joiningmerging" class="section level3">
+<h3>2. Joining/Merging</h3>
+<pre class="r"><code>library(tidyverse)
+joined1&lt;-full_join(healthinsurance,kaggle_income, by=c(&quot;State&quot;=&quot;State_Name&quot;))</code></pre>
+<p><em>I decided to use a full join function because I did not want to lose any variables while joining the two data sets. I wanted to encompass all the variables as I analyzed them and realized that a lot of my variables would be lost had I used the other joins, and I wanted to keep all of my original data which is why I used the full join function. No cases were dropped, rather more cases were added. The full join function works to retain all original data and input NAs where there are no matches between the two datasets.</em></p>
+</div>
+<div id="wrangling" class="section level3">
+<h3>3. Wrangling</h3>
+<pre class="r"><code>Texas&lt;-joined1%&gt;%filter(State==&quot;Texas&quot;)
+arangeTX&lt;-Texas%&gt;%arrange(Mean)
+selTx&lt;-Texas%&gt;%select(&quot;Medicaid.Enrollment.Change..2013.2016.&quot;,&quot;Medicare.Enrollment..2016.&quot;,Mean)
+
+Texas&lt;-Texas%&gt;%rename(MedEnrllChange=&quot;Medicaid.Enrollment.Change..2013.2016.&quot;)
+joined&lt;-joined1%&gt;%rename(MedEnrllChange=&quot;Medicaid.Enrollment.Change..2013.2016.&quot;,
+                         StMedExp=&quot;State.Medicaid.Expansion..2016.&quot;,
+                         UninRCh=&quot;Uninsured.Rate.Change..2010.2015.&quot;)%&gt;%na.omit()
+mutTx&lt;-Texas%&gt;%mutate(row_number(Median))
+joined%&gt;%summarize(avgMedicaidenrllchange=mean(MedEnrllChange,na.rm = T))</code></pre>
+<pre><code>##   avgMedicaidenrllchange
+## 1                1614722</code></pre>
+<pre class="r"><code>sum&lt;-joined%&gt;%group_by(City,County)%&gt;%
+  summarize(mean_change=mean(MedEnrllChange,na.rm = T),
+            sd(MedEnrllChange),var(MedEnrllChange))
+joined%&gt;%summarize_all(n_distinct)</code></pre>
+<pre><code>##   State Uninsured.Rate..2010. Uninsured.Rate..2015. UninRCh
+## 1    17                    17                    15      17
+##   Health.Insurance.Coverage.Change..2010.2015.
+## 1                                           17
+##   Employer.Health.Insurance.Coverage..2015.
+## 1                                        17
+##   Marketplace.Health.Insurance.Coverage..2016. Marketplace.Tax.Credits..2016.
+## 1                                           17                             17
+##   Average.Monthly.Tax.Credit..2016. StMedExp Medicaid.Enrollment..2013.
+## 1                                17        2                         17
+##   Medicaid.Enrollment..2016. MedEnrllChange Medicare.Enrollment..2016.    id
+## 1                         17             17                         17 10558
+##   State_Code State_ab County City Place Type Primary Zip_Code Area_Code ALand
+## 1         17       17    328 2795   801    5       2     4281       102  9780
+##   AWater  Lat  Lon Mean Median Stdev sum_w
+## 1   4993 9807 9806 9947   8363  9488 10414</code></pre>
+<pre class="r"><code>joined%&gt;%na.omit()%&gt;%summarize(median(MedEnrllChange))</code></pre>
+<pre><code>##   median(MedEnrllChange)
+## 1                 752748</code></pre>
+<pre class="r"><code>joined%&gt;%summarize(IQR(MedEnrllChange))</code></pre>
+<pre><code>##   IQR(MedEnrllChange)
+## 1             3692194</code></pre>
+<pre class="r"><code>joined%&gt;%summarize(min(MedEnrllChange))</code></pre>
+<pre><code>##   min(MedEnrllChange)
+## 1               -3935</code></pre>
+<pre class="r"><code>joined%&gt;%summarize(max(MedEnrllChange))</code></pre>
+<pre><code>##   max(MedEnrllChange)
+## 1             4087700</code></pre>
+<pre class="r"><code>joined%&gt;%summarize(first(MedEnrllChange))</code></pre>
+<pre><code>##   first(MedEnrllChange)
+## 1               4087700</code></pre>
+<pre class="r"><code>joined%&gt;%select(MedEnrllChange,Mean,)%&gt;%cor()</code></pre>
+<pre><code>##                MedEnrllChange       Mean
+## MedEnrllChange     1.00000000 0.06967173
+## Mean               0.06967173 1.00000000</code></pre>
+<p><em>I used the filter function to filter to get just data from Texas. I then used the arrange function to sort the data set from least to greatest.I then used the select function to choose a subset of variable/columns. And then, I used the rename function which renamed my variable names. Then, I created another variable using the mutate function. Then, I used the summarize function to find the mean of Medicaid enrollment change from 2013-2016. I grouped by City and County and did a summarize function to find the mean Medicaid Enrollment Change for each city. I continued to use the summarize functions to find the calculate the variance, standard deviation, mean, median, interquartile range, minimum, maximum, and find the first value, as well as the number of unique variables.Lastly, I did a correlation function between mean household income and Medicaid enrollment change from 2013-2016. Some results I was able to get from these analysis were the average change in Medicaid Enrollment over the 2013-2016 time frame were the correlation that resulted came out to be fairly small of 0.0697 between the Medicaid enrollment change and average household income. This value indicates a fairly weak positive correlation between the two. </em></p>
+</div>
+<div id="visualizing" class="section level3">
+<h3>4. Visualizing</h3>
+<pre class="r"><code>library(ggplot2)
+
+  ggplot(joined,aes(MedEnrllChange,Mean))+
+  geom_point(aes(color=State,))+
+  ggtitle(&quot;Mean Income vs Medicaid.Enrollment.Change..2013.2016.&quot;)+
+    ylab(&quot;Mean Income&quot;)+
+    xlab(&quot;Medicaid.Enrollment.Change..2013.2016.&quot;)+
+      scale_x_log10()+
+  scale_y_log10()+
+  theme(legend.title = element_text(size = 3), 
+               legend.text = element_text(size = 3))+
+  theme_dark()</code></pre>
+<p><img src="/Project1_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code> ggplot(joined,aes(x=State,y=MedEnrllChange,fill=StMedExp))+
+  geom_bar(stat=&quot;summary&quot;,fun.y=&quot;mean&quot;,position=&quot;dodge&quot;)+
+    coord_flip()+
+   ggtitle(&quot;State vs Medicaid.Enrollment.Change..2013.2016. vs State.Medicaid.Expansion..2016.&quot;)+
+   theme(plot.title = element_text(size=10))+
+   ylab(&quot;Medicaid.Enrollment.Change..2013.2016.&quot;)</code></pre>
+<p><img src="/Project1_files/figure-html/unnamed-chunk-5-2.png" width="672" /> <em>The first ggplot was a scatter plot and I observed the relationships between the Mean Household Income and States and Medican Enrollment Change. The results showed that most states had a big increase in Medicaid Enrollment Change with California being an outlier with a bigger increase in the Medicaid Enrollment change than any other state. There is a lot of clustering as well. There are not any significant or ntoticeable trends we can directly observe.</em> <em>The second ggplot was a bar graph I observed the relationships between the Medicaid Enrollment change and the States and whether the state Medicaid expanded. The biggest thing we can observe from this plot the increase in Medicaid enrollment change in each state. California is an outlier and has the biggest increase in Medicait enrollment change from 2013-2016.</em></p>
+</div>
+<div id="dimensionality-reduction" class="section level3">
+<h3>5. Dimensionality Reduction</h3>
+<pre class="r"><code>yeet&lt;-joined%&gt;%select_if(is.numeric)%&gt;%scale%&gt;%cov%&gt;%round(2)
+hoola&lt;-princomp(yeet)
+names(hoola)</code></pre>
+<pre><code>## [1] &quot;sdev&quot;     &quot;loadings&quot; &quot;center&quot;   &quot;scale&quot;    &quot;n.obs&quot;    &quot;scores&quot;   &quot;call&quot;</code></pre>
+<pre class="r"><code>summary(hoola,loadings = T)</code></pre>
+<pre><code>## Importance of components:
+##                           Comp.1     Comp.2     Comp.3     Comp.4     Comp.5
+## Standard deviation     1.8070073 0.49328343 0.42709124 0.24211577 0.22221943
+## Proportion of Variance 0.8366982 0.06235081 0.04674018 0.01502087 0.01265357
+## Cumulative Proportion  0.8366982 0.89904904 0.94578922 0.96081009 0.97346366
+##                            Comp.6      Comp.7      Comp.8      Comp.9
+## Standard deviation     0.20102532 0.160230371 0.151037182 0.100079765
+## Proportion of Variance 0.01035501 0.006578679 0.005845434 0.002566502
+## Cumulative Proportion  0.98381868 0.990397354 0.996242789 0.998809291
+##                             Comp.10      Comp.11      Comp.12      Comp.13
+## Standard deviation     0.0597388038 0.0282393323 1.621914e-02 2.721034e-03
+## Proportion of Variance 0.0009144545 0.0002043421 6.740697e-05 1.897217e-06
+## Cumulative Proportion  0.9997237453 0.9999280874 9.999955e-01 9.999974e-01
+##                             Comp.14      Comp.15      Comp.16      Comp.17
+## Standard deviation     2.455005e-03 1.641226e-03 9.477380e-04 7.129211e-04
+## Proportion of Variance 1.544379e-06 6.902169e-07 2.301578e-07 1.302363e-07
+## Cumulative Proportion  9.999989e-01 9.999996e-01 9.999999e-01 1.000000e+00
+##                             Comp.18      Comp.19
+## Standard deviation     2.289239e-04 1.105849e-08
+## Proportion of Variance 1.342862e-08 3.133581e-17
+## Cumulative Proportion  1.000000e+00 1.000000e+00
+## 
+## Loadings:
+##                                              Comp.1 Comp.2 Comp.3 Comp.4 Comp.5
+## Health.Insurance.Coverage.Change..2010.2015.  0.328                            
+## Employer.Health.Insurance.Coverage..2015.     0.303  0.125  0.153              
+## Marketplace.Health.Insurance.Coverage..2016.  0.328                            
+## Marketplace.Tax.Credits..2016.                0.329                            
+## Medicaid.Enrollment..2013.                    0.276  0.175  0.231              
+## Medicaid.Enrollment..2016.                    0.305  0.115  0.151              
+## MedEnrllChange                                0.329                            
+## Medicare.Enrollment..2016.                    0.301  0.128  0.170              
+## id                                                   0.312  0.359 -0.169  0.121
+## State_Code                                   -0.273         0.114         0.311
+## Zip_Code                                      0.202 -0.363 -0.347         0.302
+## ALand                                               -0.226        -0.379 -0.244
+## AWater                                              -0.211        -0.440 -0.569
+## Lat                                          -0.230                       0.392
+## Lon                                          -0.208  0.344  0.347        -0.260
+## Mean                                                 0.444 -0.451              
+## Median                                               0.302 -0.337 -0.170  0.110
+## Stdev                                                0.417 -0.397        -0.146
+## sum_w                                               -0.139         0.771 -0.386
+##                                              Comp.6 Comp.7 Comp.8 Comp.9
+## Health.Insurance.Coverage.Change..2010.2015.                            
+## Employer.Health.Insurance.Coverage..2015.                          0.158
+## Marketplace.Health.Insurance.Coverage..2016.                            
+## Marketplace.Tax.Credits..2016.                                          
+## Medicaid.Enrollment..2013.                                         0.161
+## Medicaid.Enrollment..2016.                                         0.132
+## MedEnrllChange                                                          
+## Medicare.Enrollment..2016.                                         0.141
+## id                                                  -0.261 -0.701 -0.106
+## State_Code                                                 -0.239  0.252
+## Zip_Code                                                   -0.280       
+## ALand                                         0.799 -0.111         0.281
+## AWater                                       -0.554  0.104 -0.154  0.306
+## Lat                                                  0.255  0.137  0.692
+## Lon                                                         0.346       
+## Mean                                                 0.141 -0.117       
+## Median                                       -0.159 -0.744  0.233  0.257
+## Stdev                                                0.427 -0.222       
+## sum_w                                               -0.271 -0.257  0.310
+##                                              Comp.10 Comp.11 Comp.12 Comp.13
+## Health.Insurance.Coverage.Change..2010.2015.                  0.147   0.317 
+## Employer.Health.Insurance.Coverage..2015.                    -0.132  -0.228 
+## Marketplace.Health.Insurance.Coverage..2016.                  0.411         
+## Marketplace.Tax.Credits..2016.                                0.426         
+## Medicaid.Enrollment..2013.                   -0.208          -0.429         
+## Medicaid.Enrollment..2016.                   -0.118          -0.226  -0.287 
+## MedEnrllChange                                                0.360  -0.225 
+## Medicare.Enrollment..2016.                   -0.126          -0.177   0.499 
+## id                                            0.364           0.160         
+## State_Code                                   -0.736           0.348         
+## Zip_Code                                      0.112          -0.232   0.457 
+## ALand                                                                       
+## AWater                                                                      
+## Lat                                           0.455                         
+## Lon                                                                   0.483 
+## Mean                                                  0.739                 
+## Median                                               -0.225                 
+## Stdev                                                -0.629                 
+## sum_w                                                                       
+##                                              Comp.14 Comp.15 Comp.16 Comp.17
+## Health.Insurance.Coverage.Change..2010.2015.  0.224   0.507   0.294   0.320 
+## Employer.Health.Insurance.Coverage..2015.             0.358  -0.311  -0.472 
+## Marketplace.Health.Insurance.Coverage..2016.  0.272  -0.528  -0.193  -0.378 
+## Marketplace.Tax.Credits..2016.                               -0.432   0.523 
+## Medicaid.Enrollment..2013.                   -0.234  -0.488           0.420 
+## Medicaid.Enrollment..2016.                            0.269  -0.223         
+## MedEnrllChange                               -0.660           0.484  -0.139 
+## Medicare.Enrollment..2016.                    0.260  -0.124   0.355  -0.215 
+## id                                                                          
+## State_Code                                                                  
+## Zip_Code                                     -0.380          -0.308         
+## ALand                                                                       
+## AWater                                                                      
+## Lat                                                                         
+## Lon                                          -0.402          -0.283         
+## Mean                                                                        
+## Median                                                                      
+## Stdev                                                                       
+## sum_w                                                                       
+##                                              Comp.18 Comp.19
+## Health.Insurance.Coverage.Change..2010.2015.  0.194   0.477 
+## Employer.Health.Insurance.Coverage..2015.     0.545  -0.139 
+## Marketplace.Health.Insurance.Coverage..2016.          0.411 
+## Marketplace.Tax.Credits..2016.                       -0.476 
+## Medicaid.Enrollment..2013.                    0.258   0.198 
+## Medicaid.Enrollment..2016.                   -0.744   0.171 
+## MedEnrllChange                                              
+## Medicare.Enrollment..2016.                   -0.169  -0.513 
+## id                                                          
+## State_Code                                                  
+## Zip_Code                                                    
+## ALand                                                       
+## AWater                                                      
+## Lat                                                         
+## Lon                                                   0.117 
+## Mean                                                        
+## Median                                                      
+## Stdev                                                       
+## sum_w</code></pre>
+<pre class="r"><code>apples&lt;-hoola$sdev^2
+
+round(cumsum(apples)/sum(apples),2)</code></pre>
+<pre><code>##  Comp.1  Comp.2  Comp.3  Comp.4  Comp.5  Comp.6  Comp.7  Comp.8  Comp.9 Comp.10 
+##    0.84    0.90    0.95    0.96    0.97    0.98    0.99    1.00    1.00    1.00 
+## Comp.11 Comp.12 Comp.13 Comp.14 Comp.15 Comp.16 Comp.17 Comp.18 Comp.19 
+##    1.00    1.00    1.00    1.00    1.00    1.00    1.00    1.00    1.00</code></pre>
+<pre class="r"><code>ggplot()+geom_point(aes(hoola$scores[,1], hoola$scores[,2]))+xlab(&quot;PC1&quot;)+ylab(&quot;PC2&quot;)</code></pre>
+<p><img src="/Project1_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<pre class="r"><code>hoola$loadings[1:7,1:2]%&gt;%as.data.frame%&gt;%rownames_to_column%&gt;%
+ggplot()+geom_hline(aes(yintercept=0),lty=2)+
+ geom_vline(aes(xintercept=0),lty=2)+ylab(&quot;PC2&quot;)+xlab(&quot;PC1&quot;)+
+ geom_segment(aes(x=0,y=0,xend=Comp.1,yend=Comp.2),arrow=arrow(),col=&quot;red&quot;)+
+ geom_label(aes(x=Comp.1*1.1,y=Comp.2*1.1,label=rowname),size=2)+
+  theme(legend.text = element_text(size=7))</code></pre>
+<p><img src="/Project1_files/figure-html/unnamed-chunk-6-2.png" width="672" /> <em>The first PC1 and PC2 ggplot showed some clustering. The second ggplot was a plot of loadings. Some variable names got cut off, but the ones that did are labeled as Marketplace Tax Credits (2016), Medicaid Enrollment Change (2013-2016), Marketplace Health Insurance Coverage (2016), Health Insurance Coverage Change (2010-2015), Medicaid Enrollment (2016), Employer Health Insurance Coverage (2015), and Medicaid Enrollment (2013). Angles between these vectors are interpreted as correlation and the smaller the angle, the higher the correlation. We can see from this graph that Marketplace Tax Credits (2016), Medicaid Enrollment Change (2013-2016), Marketplace Health Insurance Coverage (2016), Health Insurance Coverage Change (2010-2015) are all highly correlated with each other.</em></p>
+<p>…</p>
+</div>
+</div>
+
+              <hr>
+              <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div>
+            </div>
+          </div>
+          <hr>
+        <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+        </div>
+      </div>
+      
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="/js/docs.min.js"></script>
+<script src="/js/main.js"></script>
+
+<script src="/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

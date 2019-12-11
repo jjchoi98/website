@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "---\ntitle: Introduction\nauthor: Jonathan Choi\ndate: '2019-12-11'\nslug: my-thoughts\ncategories: []\ntags: []\ndescription: ''\n---\nHey Guys!\nWelcome to my blog!\nI really like to watch movies, play basketball, go bowling, cook, and make music.",
+    "created" : 1576050589313.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2550594810",
+    "id" : "CCBB36B1",
+    "lastKnownWriteTime" : 1576050779,
+    "last_content_update" : 1576050779873,
+    "path" : "~/Desktop/websiteSDS348/content/blog/2019-12-11-my-thoughts.Rmd",
+    "project_path" : "content/blog/2019-12-11-my-thoughts.Rmd",
+    "properties" : {
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

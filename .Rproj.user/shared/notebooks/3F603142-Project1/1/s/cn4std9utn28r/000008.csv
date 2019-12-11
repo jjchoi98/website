@@ -1,0 +1,2 @@
+"0","healthinsurance <- read.csv(""healthinsurance.csv"")"
+"0","kaggle_income <- read.csv(""kaggle_income.csv"")"

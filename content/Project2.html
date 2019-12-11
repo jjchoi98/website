@@ -1,0 +1,402 @@
+---
+title: 'Project 2: Modeling, Testing, and Predicting'
+author: "SDS348 Fall 2019"
+date: ''
+output:
+  pdf_document:
+    toc: yes
+  html_document:
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+---
+
+
+
+<div id="jonathan-choi-jjc4292" class="section level2">
+<h2>Jonathan Choi jjc4292</h2>
+</div>
+<div id="modeling" class="section level1">
+<h1>Modeling</h1>
+<ul>
+<li>**0.<em> </em>I have chosen a data set that contains data on Medical Costs that are billed by insurance to patients. This data set contains 7 variables ranging from sex, age, bmi (body mass index), the number of children they have covered by insurance, whether or not they are a smoker, region, and medical charges from insurance. This data set looks at different factors that may contribute to predicting medical costs billed by their insurance.*</li>
+</ul>
+<pre class="r"><code>library(tidyverse)
+library(dplyr)
+data&lt;-read.csv(&quot;insurance 2.csv&quot;)
+data&lt;-data%&gt;%na.omit</code></pre>
+<ul>
+<li>**1. *</li>
+</ul>
+<pre class="r"><code>#MANOVA
+man1&lt;-manova(cbind(bmi,charges)~region, data=data)
+summary(man1)</code></pre>
+<pre><code>## Df Pillai approx F num Df den Df Pr(&gt;F)
+## region 3 0.084309 19.57 6 2668 &lt; 2.2e-16 ***
+## Residuals 1334
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1</code></pre>
+<pre class="r"><code>#Univariate ANOVAs
+summary.aov(man1)</code></pre>
+<pre><code>## Response bmi :
+## Df Sum Sq Mean Sq F value Pr(&gt;F)
+## region 3 4056 1351.96 39.495 &lt; 2.2e-16 ***
+## Residuals 1334 45664 34.23
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1
+##
+## Response charges :
+## Df Sum Sq Mean Sq F value Pr(&gt;F)
+## region 3 1.3008e+09 433586560 2.9696 0.03089 *
+## Residuals 1334 1.9477e+11 146007093
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1</code></pre>
+<pre class="r"><code>#Mean Differences 
+data%&gt;%group_by(region)%&gt;%summarize(mean(bmi),mean(charges))</code></pre>
+<pre><code>## # A tibble: 4 x 3
+##   region    `mean(bmi)` `mean(charges)`
+##   &lt;fct&gt;           &lt;dbl&gt;           &lt;dbl&gt;
+## 1 northeast        29.2          13406.
+## 2 northwest        29.2          12418.
+## 3 southeast        33.4          14735.
+## 4 southwest        30.6          12347.</code></pre>
+<pre class="r"><code>#post hoc t tests 
+pairwise.t.test(data$bmi,data$region,p.adj=&quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  data$bmi and data$region 
+## 
+##           northeast northwest southeast
+## northwest 0.9544    -         -        
+## southeast &lt; 2e-16   &lt; 2e-16   -        
+## southwest 0.0020    0.0024    8.5e-10  
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code>pairwise.t.test(data$charges, data$region,p.adj=&quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  data$charges and data$region 
+## 
+##           northeast northwest southeast
+## northwest 0.2974    -         -        
+## southeast 0.1501    0.0121    -        
+## southwest 0.2643    0.9406    0.0097   
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code>1-.95^15</code></pre>
+<pre><code>## [1] 0.5367088</code></pre>
+<pre class="r"><code>ggplot(data, aes(x = age, y = bmi)) +
+ geom_point(alpha = .5) + geom_density_2d(h=50) + coord_fixed() + facet_wrap(~region)</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-2-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>datA0&lt;-data%&gt;%select(bmi,charges,region)
+covmats&lt;-datA0%&gt;%group_by(region)%&gt;%do(covs=cov(.[1:2]))
+for(i in 1:3){print(covmats$covs[i])}</code></pre>
+<pre><code>## [[1]]
+##                 bmi      charges
+## bmi        35.25406     15485.67
+## charges 15485.67295 126693102.65
+## 
+## [[1]]
+##                 bmi      charges
+## bmi        26.38635     10298.63
+## charges 10298.63059 122595316.36
+## 
+## [[1]]
+##                 bmi      charges
+## bmi        41.95992     12940.97
+## charges 12940.97080 195191595.78</code></pre>
+<p><em>1 MANOVA, 2 ANOVAS, and 12 t tests were conducted for a total of 15 tests. The adjusted alpha level is 0.05/15 = 0.333. The MANOVA test and both ANOVA tests showed a significant difference in mean bmi and mean charges between regions. The results of t tests showed that with an adjusted alpha level, Southeast and Northeast, Northwest and Southeast, Southwest and Northeast, Southwest and Northwest, and Southwest and Southeast show a significant difference in mean bmi. The results of t tests showed that with an adjusted alpha level, Norhwest and Southeast, and Southwest and Southeast show a significant difference in mean charge. The probability of a type one error is 0.5367088. The assumptions are not likely to have been met because the even though plots look normally distributed, the covariance shows no homogeneity.</em></p>
+<ul>
+<li>**2. *</li>
+</ul>
+<pre class="r"><code>dataA&lt;-data%&gt;%dplyr::select(smoker, bmi)
+
+dataA%&gt;%group_by(smoker) %&gt;% summarise(means= mean(bmi)) %&gt;% summarise(`mean_diff:`=diff(means))</code></pre>
+<pre><code>## # A tibble: 1 x 1
+##   `mean_diff:`
+##          &lt;dbl&gt;
+## 1       0.0567</code></pre>
+<pre class="r"><code>rand_dist&lt;-vector()
+for(i in 1:5000){
+yeet&lt;-data.frame(bmi=sample(dataA$bmi),smoker=dataA$smoker)
+rand_dist[i]&lt;-mean(yeet[yeet$smoker==&quot;yes&quot;,]$bmi)-
+ mean(yeet[yeet$smoker==&quot;no&quot;,]$bmi)}
+
+mean(rand_dist&gt;0.05665379   )*2</code></pre>
+<pre><code>## [1] 0.9028</code></pre>
+<pre class="r"><code>{hist(rand_dist,main=&quot;&quot;, ylab=&quot;&quot;); abline(v = 0.05665379    , col = &quot;red&quot;)}</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-3-1.png" width="768" style="display: block; margin: auto;" /> <em>The null hypothesis is that the mean bmi is the same for being a smoker and non-smoker. The alternative hypothesis is that the mean bmi is different for smokers and non-smokers.The p-value was 0.9144 which is greater than 0.05, which means we fail to reject the null hypothesis. This means that there is sufficient evidence to say that the mean bmi is the same for smoker and non-smokers.</em></p>
+<ul>
+<li>**3. *</li>
+</ul>
+<pre class="r"><code>#Center Means
+data$bmi_c&lt;-data$bmi-mean(data$bmi)
+#Linear regression model
+fit&lt;-lm(charges ~ bmi_c * region, data=data)
+summary(fit)</code></pre>
+<pre><code>##
+## Call:
+## lm(formula = charges ~ bmi_c * region, data = data)
+##
+## Residuals:
+## Min 1Q Median 3Q Max
+## -19671 -8036 -3827 4799 48781
+##
+## Coefficients:
+## Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept) 14060.83 680.46 20.664 &lt; 2e-16 ***
+## bmi_c 439.26 111.32 3.946 8.36e-05 ***
+## regionnorthwest -1072.01 965.69 -1.110 0.2672
+## regionsoutheast -155.85 958.05 -0.163 0.8708
+## regionsouthwest -1683.67 947.24 -1.777 0.0757 .
+## bmi_c:regionnorthwest -48.96 169.99 -0.288 0.7734
+## bmi_c:regionsoutheast -130.85 147.16 -0.889 0.3741
+## bmi_c:regionsouthwest 13.39 160.73 0.083 0.9336
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1
+##
+## Residual standard error: 11880 on 1330 degrees of
+freedom
+## Multiple R-squared: 0.04284, Adjusted R-squared: 0.0378
+## F-statistic: 8.504 on 7 and 1330 DF, p-value: 3.232e-10</code></pre>
+<pre class="r"><code>#Plot
+ggplot(data, aes(x=bmi, y=charges,group=region))+geom_point(aes(color=region))+
+ geom_smooth(method=&quot;lm&quot;,formula=y~1,se=F,fullrange=T,aes(color=region))+
+theme(legend.position=c(.9,.19))+xlab(&quot;&quot;)</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-4-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#Assumptions
+library(sandwich)
+library(lmtest)
+bptest(fit)</code></pre>
+<pre><code>## 
+##  studentized Breusch-Pagan test
+## 
+## data:  fit
+## BP = 124.23, df = 7, p-value &lt; 2.2e-16</code></pre>
+<pre class="r"><code>resids&lt;-fit$residuals
+fitvals&lt;-fit$fitted.values
+ggplot()+geom_point(aes(fitvals,resids))+geom_hline(yintercept=0, color=&#39;red&#39;)</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-4-2.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot()+geom_histogram(aes(resids), bins=20)</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-4-3.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>shapiro.test(resids) </code></pre>
+<pre><code>## 
+##  Shapiro-Wilk normality test
+## 
+## data:  resids
+## W = 0.86331, p-value &lt; 2.2e-16</code></pre>
+<pre class="r"><code>#robust standard errors 
+summary(fit)$coef[,1:2]</code></pre>
+<pre><code>##                          Estimate Std. Error
+## (Intercept)           14060.83410   680.4617
+## bmi_c                   439.25923   111.3194
+## regionnorthwest       -1072.00884   965.6946
+## regionsoutheast        -155.85213   958.0480
+## regionsouthwest       -1683.66797   947.2426
+## bmi_c:regionnorthwest   -48.95784   169.9928
+## bmi_c:regionsoutheast  -130.84658   147.1608
+## bmi_c:regionsouthwest    13.39250   160.7335</code></pre>
+<pre class="r"><code>coeftest(fit, vcov = vcovHC(fit))[,1:2]</code></pre>
+<pre><code>##                          Estimate Std. Error
+## (Intercept)           14060.83410   709.7311
+## bmi_c                   439.25923   110.4132
+## regionnorthwest       -1072.00884  1004.9772
+## regionsoutheast        -155.85213   969.9205
+## regionsouthwest       -1683.66797   949.9183
+## bmi_c:regionnorthwest   -48.95784   168.6683
+## bmi_c:regionsoutheast  -130.84658   161.2678
+## bmi_c:regionsouthwest    13.39250   154.5814</code></pre>
+<pre class="r"><code>#Main effects 
+fit2&lt;-lm(charges ~ bmi_c + region, data=data)
+summary(fit2)</code></pre>
+<pre><code>##
+## Call:
+## lm(formula = charges ~ bmi_c + region, data = data)
+##
+## Residuals:
+## Min 1Q Median 3Q Max
+## -21274 -8010 -3849 4794 49024
+##
+## Coefficients:
+## Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept) 13986.74 664.67 21.043 &lt; 2e-16 ***
+## bmi_c 389.53 55.55 7.012 3.72e-12 ***
+## regionnorthwest -999.05 931.95 -1.072 0.2839
+## regionsoutheast -300.17 935.98 -0.321 0.7485
+## regionsouthwest -1613.79 935.30 -1.725 0.0847 .
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1
+##
+## Residual standard error: 11870 on 1333 degrees of
+freedom
+## Multiple R-squared: 0.04197, Adjusted R-squared: 0.0391
+## F-statistic: 14.6 on 4 and 1333 DF, p-value: 1.124e-11</code></pre>
+<p><em>The coefficient estimate of the intercept is 14060.83 which indicates the amount charged when bmi and located in the northeast. The coefficient of bmi_c is 439.26 when all other variables are controlled.This means that if there is 1 unit increase in bmi would then increase amount charged from insurance by 439.26 dollars. The coefficient of regionnorthwest is -1072.01, which means that for 1 increase in bmi it would decrease amount charged by 1072.26 dollars. The coefficient of regionsoutheast is -155.85, which means that for 1 increase in bmi, it would decrease amount charged by 155.85 dollars. The coefficient of regionsouthwest is -1683.67, which means that for 1 increase in bmi, it would decrease the amount charged by 1683.67 dollars. The coefficient of bmi_c:regionnorthwest is -48.96 which means that for 1 increase in bmi, the slope of regionnorthwest decreases by 48.96. The coefficient of bmi_c:regionsoutheast is -130.85, which means that for 1 increase in bmi, the slope of regionsoutheast decreases by 130.85. The coefficient of bmi_c:southwest is 13.39 which means that for 1 increase in bmi, the slope of regionsouthwest is increased by 13.39. The interaction plot shows the lines to be parallel; thus, there is no significant interaction. Looking at the ggplot, the homoskedasticity and linearity is not that great. The p-value from the bptest is 2.2x10^-16 which is less than 0.05; thus the homoskedasticity is not met. Based on the graphs, normality looks ok. The Shapiro-Wilk normality test gives a p-value of less than 0.05 which means our distribution is normal. Comparing the uncorrected SE and the robust SEs, the standard errors increased for the intercept, bmi_c, regionnorthwest, regionnsoutheast, regionsouthwest. This means that as the standard errors increased, then the p-values also increased. The model explains 0.04284 of the variation of the outcome.</em></p>
+<ul>
+<li>**4.*</li>
+</ul>
+<pre class="r"><code>samp_distn&lt;-replicate(5000, {
+ boot_dat&lt;-data[sample(nrow(data),replace=TRUE),]
+ fit3&lt;-lm(charges ~ bmi_c * region,data=boot_dat)
+ coef(fit3)
+})
+samp_distn%&gt;%t%&gt;%as.data.frame%&gt;%summarize_all(sd)</code></pre>
+<pre><code>## (Intercept) bmi_c regionnorthwest regionsoutheast
+regionsouthwest bmi_c:regionnorthwest
+## 1 713.9327 109.4091 999.4348 963.0441 950.7329 166.8187
+## bmi_c:regionsoutheast bmi_c:regionsouthwest
+## 1 159.2829 154.4963</code></pre>
+<p><em>Bootstrapped standard errors are greater than original standard errors but less than robust SEs.</em></p>
+<ul>
+<li>**5.*</li>
+</ul>
+<pre class="r"><code>#logistic regression
+data1&lt;-data%&gt;%mutate(smoker=ifelse(data$smoker==&quot;yes&quot;,1,0))
+fit4&lt;-glm(smoker~charges+bmi,data=data1,family=binomial(link=&quot;logit&quot;))
+coeftest(fit4)</code></pre>
+<pre><code>##
+## z test of coefficients:
+##
+## Estimate Std. Error z value Pr(&gt;|z|)
+## (Intercept) 9.6342e-01 6.7480e-01 1.4277 0.1534
+## charges 3.1923e-04 2.1153e-05 15.0913 &lt;2e-16 ***
+## bmi -2.8312e-01 3.2181e-02 -8.7977 &lt;2e-16 ***
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1</code></pre>
+<pre class="r"><code>#coefficients
+exp(coef(fit4))</code></pre>
+<pre><code>## (Intercept)     charges         bmi 
+##   2.6206461   1.0003193   0.7534329</code></pre>
+<pre class="r"><code>#confusion matrix 
+data$predicted&lt;-predict(fit4, data=data, type = &quot;response&quot;)
+table(predict=as.numeric(data$predicted&gt;.5),truth=data$smoker)%&gt;%addmargins</code></pre>
+<pre><code>##        truth
+## predict   no  yes  Sum
+##     0   1029   54 1083
+##     1     35  220  255
+##     Sum 1064  274 1338</code></pre>
+<pre class="r"><code>#accuracy
+(220+1029)/1338</code></pre>
+<pre><code>## [1] 0.9334828</code></pre>
+<pre class="r"><code>#sensitivity 
+220/255</code></pre>
+<pre><code>## [1] 0.8627451</code></pre>
+<pre class="r"><code>#specificity (TNR)
+1029/1064</code></pre>
+<pre><code>## [1] 0.9671053</code></pre>
+<pre class="r"><code>#PPV
+220/274</code></pre>
+<pre><code>## [1] 0.8029197</code></pre>
+<pre class="r"><code>#Density plot
+
+odds&lt;-function(p)p/(1-p)
+p&lt;-seq(0,1,by=.1)
+logit&lt;-function(p)log(odds(p))
+data$logit&lt;- predict(fit4)
+ggplot(data) + geom_density(aes(logit, fill=as.factor(smoker)))</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-6-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#ROC plot
+library(plotROC) 
+ggplot(data,aes(charges,predicted,color=bmi))+geom_line()</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-6-2.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ROCplot&lt;-ggplot(data)+geom_roc(aes(d=smoker,m=predicted), n.cuts=0)+
+ geom_segment(aes(x=0,xend=1,y=0,yend=1),lty=2)
+ROCplot</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-6-3.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#AUC
+calc_auc(ROCplot)</code></pre>
+<pre><code>##   PANEL group       AUC
+## 1     1    -1 0.9823229</code></pre>
+<pre class="r"><code>##CV
+class_diag&lt;-function(probs,truth){
+
+tab&lt;-table(factor(probs&gt;.5,levels=c(&quot;FALSE&quot;,&quot;TRUE&quot;)),truth)
+acc=sum(diag(tab))/sum(tab)
+sens=tab[2,2]/colSums(tab)[2]
+spec=tab[1,1]/colSums(tab)[1]
+ppv=tab[2,2]/rowSums(tab)[2]
+
+if(is.numeric(truth)==FALSE &amp; is.logical(truth)==FALSE) truth&lt;-as.numeric(truth)-1
+
+ord&lt;-order(probs, decreasing=TRUE)
+probs &lt;- probs[ord]; truth &lt;- truth[ord]
+
+TPR=cumsum(truth)/max(1,sum(truth)) 
+FPR=cumsum(!truth)/max(1,sum(!truth))
+
+dup&lt;-c(probs[-1]&gt;=probs[-length(probs)], FALSE)
+TPR&lt;-c(0,TPR[!dup],1); FPR&lt;-c(0,FPR[!dup],1)
+
+n &lt;- length(TPR)
+auc&lt;- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )
+
+data.frame(acc,sens,spec,ppv,auc)
+}
+
+set.seed(1234)
+k=10
+
+dataX&lt;-data[sample(nrow(data)),]
+folds&lt;-cut(seq(1:nrow(data)),breaks=k,labels=F)
+
+diags&lt;-NULL
+for(i in 1:k){
+train&lt;-dataX[folds!=i,]
+test&lt;-dataX[folds==i,]
+truth&lt;-test$smoker
+fit6&lt;- glm(smoker~charges+bmi,data=train,family=binomial(link=&quot;logit&quot;))
+probs&lt;- predict(fit6, newdata=test, type=&quot;response&quot;)
+diags&lt;-rbind(diags,class_diag(probs,truth))}
+
+apply(diags,2,mean)</code></pre>
+<pre><code>##       acc      sens      spec       ppv       auc 
+## 0.9319661 0.8097611 0.9643649 0.8593115 0.9820508</code></pre>
+<p><em>For 0 bmi and 0 charge, the odds of being a smoker is 2.6206461. Controlling for bmi, for every 1 unit increase in charges, the odds of being a smoker changes by a factor of 1.0003193. Controlling for charges, for every 1 unit increase in bmi, the odds of being a smoker changes by a factor of 0.7534329. The accuracy is 0.9334828. The sensitivity is 0.8627451. The specificity is 0.9671053. The PPV is 0.8029197. The AUC is 0.9823229, which means that this model is very good at predicting activity. After doing 10-fold CV, the accuracy is 0.9312816, the sensitivity is 0.7948521, the specificity is 0.9663455, the PPV is 0.8569134, and the AUC increased slightly to 0.9824689. There was not much overfitting be4cause there wasn’t a big change.</em></p>
+<ul>
+<li>**6. *</li>
+</ul>
+<pre class="r"><code>library(glmnet)
+y&lt;-as.matrix(data$smoker)
+x&lt;-data%&gt;%dplyr::select(-smoker,-region,-sex,-predicted)%&gt;%mutate_all(scale)%&gt;%as.matrix
+cv&lt;-cv.glmnet(x,y,family=&quot;binomial&quot;)
+lasso&lt;-glmnet(x,y,family=&quot;binomial&quot;,lambda=cv$lambda.1se)
+coef(lasso)</code></pre>
+<pre><code>## 7 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
+##                     s0
+## (Intercept) -2.8416577
+## age         -0.6534767
+## bmi          .        
+## children     .        
+## charges      0.1779461
+## bmi_c        .        
+## logit        2.9391343</code></pre>
+<pre class="r"><code>set.seed(1234)
+k=10
+
+dataX&lt;-data[sample(nrow(data)),]
+folds&lt;-cut(seq(1:nrow(data)),breaks=k,labels=F)
+
+diags2&lt;-NULL
+for(i in 1:k){
+train2&lt;-dataX[folds!=i,]
+test2&lt;-dataX[folds==i,]
+truth2&lt;-test$smoker
+fit7&lt;- glm(smoker~age, bmi, charges,data=train2,family=binomial(link=&quot;logit&quot;))
+probs2&lt;- predict(fit7, newdata=test, type=&quot;response&quot;)
+diags2&lt;-rbind(diags2,class_diag(probs2,truth2))}
+
+apply(diags2,2,mean)</code></pre>
+<pre><code>##       acc      sens      spec       ppv       auc 
+## 0.8111940 0.0040000 0.9963303       NaN 0.5450642</code></pre>
+<p><em>The variables that were retained were age, charges, and logit. The AUC was 0.5153859. The specificity was 0.1185185. The accuracy was 0.7350746. The specificity was 0.8906542. After performing a 10 fold cv, the accuracy from this model was lower than that of my logistic regression in part 5.</em></p>
+<p>…</p>
+</div>
