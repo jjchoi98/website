@@ -1,7 +1,7 @@
 ---
 title: 'Project 2: Modeling, Testing, and Predicting'
 author: "SDS348 Fall 2019"
-date: ''
+date: '2019-12-11'
 output:
   pdf_document:
     toc: yes
@@ -129,7 +129,7 @@ rand_dist[i]&lt;-mean(yeet[yeet$smoker==&quot;yes&quot;,]$bmi)-
  mean(yeet[yeet$smoker==&quot;no&quot;,]$bmi)}
 
 mean(rand_dist&gt;0.05665379   )*2</code></pre>
-<pre><code>## [1] 0.8928</code></pre>
+<pre><code>## [1] 0.9104</code></pre>
 <pre class="r"><code>{hist(rand_dist,main=&quot;&quot;, ylab=&quot;&quot;); abline(v = 0.05665379    , col = &quot;red&quot;)}</code></pre>
 <p><img src="/Project2_files/figure-html/unnamed-chunk-3-1.png" width="768" style="display: block; margin: auto;" /> <em>The null hypothesis is that the mean bmi is the same for being a smoker and non-smoker. The alternative hypothesis is that the mean bmi is different for smokers and non-smokers.The p-value was 0.9144 which is greater than 0.05, which means we fail to reject the null hypothesis. This means that there is sufficient evidence to say that the mean bmi is the same for smoker and non-smokers.</em></p>
 <ul>
@@ -251,9 +251,9 @@ freedom
 samp_distn%&gt;%t%&gt;%as.data.frame%&gt;%summarize_all(sd)</code></pre>
 <pre><code>## (Intercept) bmi_c regionnorthwest regionsoutheast
 regionsouthwest bmi_c:regionnorthwest
-## 1 718.7764 110.0578 1015.468 975.988 954.461 169.0851
+## 1 709.6472 108.9122 987.8031 966.811 950.6392 167.9072
 ## bmi_c:regionsoutheast bmi_c:regionsouthwest
-## 1 160.893 152.1001</code></pre>
+## 1 160.1083 152.8015</code></pre>
 <p><em>Bootstrapped standard errors are greater than original standard errors but less than robust SEs.</em></p>
 <ul>
 <li>**5.Logistic Regression*</li>

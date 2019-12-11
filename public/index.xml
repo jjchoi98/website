@@ -21,6 +21,15 @@
     </item>
     
     <item>
+      <title>Project 2: Modeling, Testing, and Predicting</title>
+      <link>/project2/</link>
+      <pubDate>Wed, 11 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/project2/</guid>
+      <description>Jonathan Choi jjc4292  Modeling  **0. I have chosen a data set that contains data on Medical Costs that are billed by insurance to patients. This data set contains 7 variables ranging from sex, age, bmi (body mass index), the number of children they have covered by insurance, whether or not they are a smoker, region, and medical charges from insurance. This data set looks at different factors that may contribute to predicting medical costs billed by their insurance.</description>
+    </item>
+    
+    <item>
       <title>Python</title>
       <link>/blog/python/</link>
       <pubDate>Wed, 11 Dec 2019 00:00:00 +0000</pubDate>
@@ -40,24 +49,6 @@ import re string1=&amp;quot;We have to extract these numbers 12, 47, 48 The inte
   Project 1
   Project 2
   </description>
-    </item>
-    
-    <item>
-      <title></title>
-      <link>/myresume/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/myresume/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Project 2: Modeling, Testing, and Predicting</title>
-      <link>/project2/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/project2/</guid>
-      <description>Jonathan Choi jjc4292  Modeling  **0. I have chosen a data set that contains data on Medical Costs that are billed by insurance to patients. This data set contains 7 variables ranging from sex, age, bmi (body mass index), the number of children they have covered by insurance, whether or not they are a smoker, region, and medical charges from insurance. This data set looks at different factors that may contribute to predicting medical costs billed by their insurance.</description>
     </item>
     
   </channel>

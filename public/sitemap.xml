@@ -18,6 +18,11 @@
   </url>
   
   <url>
+    <loc>/project2/</loc>
+    <lastmod>2019-12-11T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>/blog/python/</loc>
     <lastmod>2019-12-11T00:00:00+00:00</lastmod>
   </url>
@@ -45,15 +50,6 @@
   <url>
     <loc>/tags/</loc>
     <lastmod>2016-10-02T22:55:05-04:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/myresume/</loc>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>/project2/</loc>
   </url>
   
 </urlset>
